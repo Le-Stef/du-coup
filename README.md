@@ -1,7 +1,7 @@
 # Du coup...
 Ne dites plus "Du coup" !
 
-=> a finaliser : Regardez toutes ces expressions que vous pourriez utiliser avantageusement.
+Découvrez 60 expressions alternatives présentées sous forme de nuage de mots animé.
 
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat&logo=html5&logoColor=white)](https://fr.wikipedia.org/wiki/Hypertext_Markup_Language)
@@ -10,7 +10,17 @@ Ne dites plus "Du coup" !
 
 ## Description
 
-=> a finaliser
+Une page web interactive qui affiche un nuage de mots avec toutes les façons de remplacer l'expression "du coup". Les mots se positionnent automatiquement grâce à une simulation physique : ils se repoussent jusqu'à ce qu'aucun ne se chevauche. L'animation continue tant que les mots n'ont pas trouvé leur place.
+
+L'expression "du coup" apparaît barrée en rouge, car je ne l'aime pas.
+
+### Caractéristiques
+
+- **Zéro dépendance externe** : JavaScript vanilla uniquement
+- **Simulation physique** : forces de répulsion entre les mots
+- **Animation perpétuelle** : continue jusqu'à stabilisation complète
+- **Responsive** : s'adapte à la taille de l'écran
+- **60 expressions alternatives** avec tailles variables selon leur pertinence
 
 ## Technologies Utilisées
 
