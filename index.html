@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Ne dites plus "Du coup"</title>
+<style>
+	html, body {
+		margin: 0;
+		padding: 0;
+		background: linear-gradient(135deg,
+			rgba(168, 193, 209, 1) 0%,
+			rgba(234, 229, 217, 0.9) 20%,
+			rgba(250, 186, 139, 0.5) 40%,
+			rgba(199, 110, 122, 0.4) 60%,
+			rgba(106, 135, 165, 0.3) 80%,
+			rgba(137, 85, 112, 0.5) 100%
+		);
+		width: 100%;
+		height: 100%;
+		overflow: hidden;
+	}
+	svg {
+		width: 100%;
+		height: 100%;
+	}
+</style>
+</head>
+<body>
+	<svg id="fresque" xmlns="http://www.w3.org/2000/svg"></svg>
+
+	<script>
+	const expressions = [
+		{text: "ainsi", power: 5},
+		{text: "à la fin", power: 2},
+		{text: "à la suite de quoi", power: 4},
+		{text: "alors", power: 5},
+		{text: "au final", power: 3},
+		{text: "aussi", power: 3},
+		{text: "ceci dit", power: 4},
+		{text: "cela étant", power: 4},
+		{text: "dans ce cas", power: 4},
+		{text: "partant de ce principe", power: 4},
+		{text: "en l'occurrence", power: 3},
+		{text: "en effet", power: 3},
+		{text: "effectivement", power: 2},
+		{text: "en réalité", power: 3},
+		{text: "pour cette raison", power: 4},
+		{text: "si bien que", power: 3},
+		{text: "automatiquement", power: 2},
+		{text: "ayant pour effet", power: 2},
+		{text: "bref", power: 5},
+		{text: "ce qui entraîne", power: 2},
+		{text: "ce qui produit", power: 2},
+		{text: "c'est pourquoi", power: 3},
+		{text: "conséquemment", power: 4},
+		{text: "dans ces conditions", power: 3},
+		{text: "de ce fait", power: 4},
+		{text: "de fait", power: 5},
+		{text: "de fil en aiguille", power: 2},
+		{text: "de là", power: 3},
+		{text: "de sorte que", power: 3},
+		{text: "dès lors", power: 3},
+		{text: "donc", power: 5},
+		{text: "d'où", power: 4},
+		{text: "en clair", power: 3},
+		{text: "dans la foulée", power: 4},
+		{text: "au vu de la situation", power: 3},
+		{text: "moyennant quoi", power: 2},
+		{text: "en conséquence", power: 4},
+		{text: "en corollaire", power: 3},
+		{text: "en définitive", power: 3},
+		{text: "en fin de compte", power: 3},
+		{text: "en résumé", power: 3},
+		{text: "en somme", power: 4},
+		{text: "ergo", power: 3},
+		{text: "finalement", power: 3},
+		{text: "forcément", power: 2},
+		{text: "ipso facto", power: 1},
+		{text: "logiquement", power: 2},
+		{text: "naturellement", power: 4},
+		{text: "par conséquent", power: 4},
+		{text: "par la suite", power: 3},
+		{text: "par voie de conséquence", power: 2},
+		{text: "partant de là", power: 2},
+		{text: "pour finir", power: 3},
+		{text: "résultat", power: 4},
+		{text: "résultat des courses", power: 3},
+		{text: "subséquemment", power: 4},
+		{text: "tout compte fait", power: 3},
+		{text: "de cette façon", power: 3},
+		{text: "ce faisant", power: 4},
+		{text: "en retour", power: 3},
+		{text: "suite à cela", power: 4},
+		{text: "à partir de là", power: 3},
+		{text: "du coup", power: 1, strikethrough: true}
+	];
+
+	const svg = document.getElementById('fresque');
+	const width = window.innerWidth;
+	const height = window.innerHeight;
+	svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+
+	// Échelles linéaires simples
+	const lerp = (a, b, t) => a + (b - a) * t;
+	const scale = (val, inMin, inMax, outMin, outMax) =>
+		lerp(outMin, outMax, (val - inMin) / (inMax - inMin));
+
+	// Création des nœuds avec physique
+	const nodes = expressions.map((d, i) => {
+		const size = scale(d.power, 1, 5, 12, 46);
+		const angle = (i / expressions.length) * Math.PI * 2;
+		const radius = 150 + Math.random() * 200;
+		
+		// Rotation : 0° ou 90° avec probabilité variable selon la longueur
+		const rotate = (d.text.length < 12 && Math.random() > 0.6) ? 90 : 0;
+		return {
+			text: d.text,
+			size,
+			weight: Math.round(scale(d.power, 1, 5, 400, 900)),
+			strikethrough: d.strikethrough || false,
+			rotate,
+			// Position initiale en cercle étalé
+			x: width / 2 + Math.cos(angle) * radius,
+			y: height / 2 + Math.sin(angle) * radius,
+			vx: 0,
+			vy: 0,
+			width: 0,
+			height: 0
+		};
+	});
+
+	// Création des éléments SVG
+	const NS = 'http://www.w3.org/2000/svg';
+	const group = document.createElementNS(NS, 'g');
+	svg.appendChild(group);
+
+	nodes.forEach(node => {
+		const text = document.createElementNS(NS, 'text');
+		text.textContent = node.text;
+		text.setAttribute('text-anchor', 'middle');
+		text.setAttribute('dominant-baseline', 'middle');
+		text.style.fontSize = `${node.size}px`;
+		text.style.fontWeight = node.weight;
+		text.style.fontFamily = 'Arial Black, Arial, sans-serif';
+		text.style.fill = '#222';
+		node.el = text;
+		group.appendChild(text);
+
+		if (node.strikethrough) {
+			const line = document.createElementNS(NS, 'line');
+			line.setAttribute('stroke', 'rgba(255, 0, 0, 0.8)');
+			line.setAttribute('stroke-width', Math.max(2, node.size * 0.12));
+			node.lineEl = line;
+			group.appendChild(line);
+		}
+	});
+
+	// Mesure des dimensions réelles après rendu
+	nodes.forEach(node => {
+		const bbox = node.el.getBBox();
+		
+		// Inversion width/height si rotation 90°
+		if (node.rotate === 90) {
+			node.width = bbox.height + 6;
+			node.height = bbox.width + 10;
+		} else {
+			node.width = bbox.width + 10;
+			node.height = bbox.height + 6;
+		}
+	});
+
+	// Détection de collision entre deux rectangles (avec marge)
+	function collides(a, b, margin = 0) {
+		return !(a.x + a.width / 2 + margin < b.x - b.width / 2 - margin ||
+				 a.x - a.width / 2 - margin > b.x + b.width / 2 + margin ||
+				 a.y + a.height / 2 + margin < b.y - b.height / 2 - margin ||
+				 a.y - a.height / 2 - margin > b.y + b.height / 2 + margin);
+	}
+
+	// Simulation physique
+	const centerX = width / 2;
+	const centerY = height / 2;
+	const damping = 0.75;
+	const centerForce = 0.002;
+	const repulsionStrength = 3;
+	const minDistance = 8;
+
+	function simulate() {
+		// Application de l'amortissement
+		nodes.forEach(n => { n.vx *= damping; n.vy *= damping; });
+
+		// Forces de répulsion entre nœuds se chevauchant ou trop proches
+		for (let i = 0; i < nodes.length; i++) {
+			for (let j = i + 1; j < nodes.length; j++) {
+				const a = nodes[i];
+				const b = nodes[j];
+
+				if (collides(a, b, minDistance)) {
+					const dx = b.x - a.x || (Math.random() - 0.5);
+					const dy = b.y - a.y || (Math.random() - 0.5);
+					const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+
+					// Force proportionnelle au chevauchement
+					const overlapX = (a.width + b.width) / 2 + minDistance - Math.abs(dx);
+					const overlapY = (a.height + b.height) / 2 + minDistance - Math.abs(dy);
+					const overlap = Math.min(overlapX, overlapY);
+
+					const force = overlap * repulsionStrength / dist;
+					const fx = (dx / dist) * force;
+					const fy = (dy / dist) * force;
+
+					a.vx -= fx;
+					a.vy -= fy;
+					b.vx += fx;
+					b.vy += fy;
+				}
+			}
+		}
+
+		// Attraction vers le centre UNIQUEMENT si le mot n'est en collision avec rien
+		nodes.forEach(n => {
+			const inCollision = nodes.some(other => other !== n && collides(n, other, minDistance));
+			if (!inCollision) {
+				n.vx += (centerX - n.x) * centerForce;
+				n.vy += (centerY - n.y) * centerForce;
+			}
+		});
+
+		// Application des vitesses
+		nodes.forEach(n => {
+			n.x += n.vx;
+			n.y += n.vy;
+
+			// Contraintes des bords avec une marge
+			const margin = 20;
+			n.x = Math.max(n.width / 2 + margin, Math.min(width - n.width / 2 - margin, n.x));
+			n.y = Math.max(n.height / 2 + margin, Math.min(height - n.height / 2 - margin, n.y));
+		});
+	}
+
+	function render() {
+		nodes.forEach(node => {
+		
+			// Application des position et rotation
+			node.el.setAttribute('transform',
+				`translate(${node.x}, ${node.y}) rotate(${node.rotate})`
+			);
+
+			if (node.lineEl) {
+			
+				// La ligne suit la rotation du texte
+				const bbox = node.el.getBBox();
+				const halfWidth = bbox.width / 2 - 2;
+				node.lineEl.setAttribute('transform',
+					`translate(${node.x}, ${node.y}) rotate(${node.rotate})`
+				);
+				node.lineEl.setAttribute('x1', -halfWidth);
+				node.lineEl.setAttribute('x2', halfWidth);
+				node.lineEl.setAttribute('y1', 0);
+				node.lineEl.setAttribute('y2', 0);
+			}
+		});
+	}
+
+	// Vérification de l'existence de collisions
+	function hasCollisions() {
+		for (let i = 0; i < nodes.length; i++) {
+			for (let j = i + 1; j < nodes.length; j++) {
+				if (collides(nodes[i], nodes[j], 0)) return true;
+			}
+		}
+		return false;
+	}
+
+	// Boucle d'animation perpétuelle tant qu'il y a des collisions
+	function animate() {
+		simulate();
+		render();
+
+		if (hasCollisions()) {
+			requestAnimationFrame(animate);
+		}
+	}
+
+	animate();
+	</script>
+</body>
+</html>
